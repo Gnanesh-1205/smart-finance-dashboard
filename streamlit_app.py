@@ -1,54 +1,50 @@
 import streamlit as st
 
-st.set_page_config(page_title="Smart Finance Dashboard ", layout="centered")
+# Page configuration
+st.set_page_config(page_title="Smart Finance Dashboard", layout="centered")
 
-st.title("👋 Welcome to Your Smart Finance Dashboard ")
+st.markdown("## 💼 Smart Finance Dashboard")
+st.markdown("Welcome! Analyze your monthly spending and check your financial health 🔍")
 
-# Input Section
-income = st.number_input("Enter your monthly income (in ₹):", min_value=0)
-rent = st.number_input("Enter your monthly Rent expense (in ₹):", min_value=0)
-food = st.number_input("Enter your monthly Food expense (in ₹):", min_value=0)
-transport = st.number_input("Enter your monthly Transport expense (in ₹):", min_value=0)
-subscriptions = st.number_input("Enter your monthly Subscriptions expense (in ₹):", min_value=0)
-shopping = st.number_input("Enter your monthly Shopping expense (in ₹):", min_value=0)
-others = st.number_input("Enter your monthly Others expense (in ₹):", min_value=0)
+# --- Input Section in Columns ---
+st.markdown("### 📥 Enter Your Monthly Income & Expenses")
 
-if st.button("Analyze"):
-    total_expenses = rent + food + transport + subscriptions + shopping + others
-    savings = income - total_expenses
+col1, col2 = st.columns(2)
+with col1:
+    income = st.number_input("Monthly Income (₹)", min_value=0, step=100)
+    rent = st.number_input("🏠 Rent (₹)", min_value=0, step=100)
+    food = st.number_input("🍽 Food (₹)", min_value=0, step=100)
+    transport = st.number_input("🚌 Transport (₹)", min_value=0, step=100)
+with col2:
+    subscriptions = st.number_input("📺 Subscriptions (₹)", min_value=0, step=100)
+    shopping = st.number_input("🛍 Shopping (₹)", min_value=0, step=100)
+    others = st.number_input("🔧 Others (₹)", min_value=0, step=100)
 
-    st.subheader("Summary:")
+# --- Calculate on Button ---
+if st.button("💡 Analyze My Finances"):
+    total_expense = rent + food + transport + subscriptions + shopping + others
+    savings = income - total_expense
+    percent = lambda amt: (amt / income * 100) if income else 0
+
+    # --- Summary Output ---
+    st.markdown("---")
+    st.subheader("📊 Financial Summary")
     st.write(f"**Total Income:** ₹{income}")
-    st.write(f"**Total Expenses:** ₹{total_expenses}")
+    st.write(f"**Total Expenses:** ₹{total_expense}")
     st.write(f"**Savings:** ₹{savings}")
 
-    st.subheader("Expense Breakdown by Category:")
+    st.markdown("### 📈 Expense Breakdown")
+    st.write(f"🏠 Rent: ₹{rent} ({percent(rent):.2f}%)")
+    st.write(f"🍽 Food: ₹{food} ({percent(food):.2f}%)")
+    st.write(f"🚌 Transport: ₹{transport} ({percent(transport):.2f}%)")
+    st.write(f"📺 Subscriptions: ₹{subscriptions} ({percent(subscriptions):.2f}%)")
+    st.write(f"🛍 Shopping: ₹{shopping} ({percent(shopping):.2f}%)")
+    st.write(f"🔧 Others: ₹{others} ({percent(others):.2f}%)")
 
-    categories = {
-        "Rent": rent,
-        "Food": food,
-        "Transport": transport,
-        "Subscriptions": subscriptions,
-        "Shopping": shopping,
-        "Others": others
-    }
-
-    for category, amount in categories.items():
-        percent = (amount / income * 100) if income > 0 else 0
-        st.write(f"{category}: ₹{amount} ({percent:.2f}%)")
-        if category == "Rent" and percent > 40:
-            st.warning("⚠️ Your rent is above 40% of income. Try to reduce housing costs.")
-        if category == "Food" and percent > 30:
-            st.warning("⚠️ You're spending a lot on food. Try cooking more at home.")
-
-    st.subheader("🧮 Your Financial Health Score:")
+    st.markdown("### 🧮 Financial Health Score")
     if savings >= income * 0.2:
-        st.success("🟢 Great! You're saving well.")
-        score = 100
+        st.success("🟢 Great! You're saving well. (Score: 100/100)")
     elif savings >= 0:
-        st.info("🟡 Okay, but could save more.")
-        score = 60
+        st.info("🟡 You're okay, but could save more. (Score: 60/100)")
     else:
-        st.error("🔴 Warning! Your financial habits need serious attention.")
-        score = 0
-    st.write(f"Your Score: **{score} / 100**")
+        st.error("🔴 You're overspending. (Score: 0/100)")
